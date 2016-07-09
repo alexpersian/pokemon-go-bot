@@ -30,16 +30,28 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
         } else if text.hasPrefix("server status") {
+
             let start = NSDate()
-            let response = try app.client.get("https://pgorelease.nianticlabs.com/plfe/")
+            guard let response = try? app.client.get("https://pgorelease.nianticlabs.com/plfe/") else { print("[RESPONSE FAILURE]"); return }
+
             let responseTime = start.timeIntervalSinceNow * (-1)
             print(responseTime)
+
             if responseTime < 0.8 {
-                try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online. Catch 'em all! :pokeball:"))
+                guard (try? ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online. Catch 'em all! :pokeball:"))) != nil else {
+                    print("[UP FAILURE]")
+                    return
+                }
             } else if responseTime < 3.0 {
-                try ws.send(SlackMessage(to: channel, text: "The servers are struggling... :muk:"))
+                guard (try? ws.send(SlackMessage(to: channel, text: "The servers are struggling... :muk:"))) != nil else {
+                    print("[STRUGGLE FAILURE]")
+                    return
+                }
             } else {
-                try ws.send(SlackMessage(to: channel, text: ":magmar: Servers are on fire!!! :magmar:"))
+                guard (try? ws.send(SlackMessage(to: channel, text: ":magmar: Servers are on fire!!! :magmar:"))) != nil else {
+                    print("[FIRE FAILURE]")
+                    return
+                }
             }
         }
     }
