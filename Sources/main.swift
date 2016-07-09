@@ -30,11 +30,11 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
         } else if text.hasPrefix("server status") {
-            let start = Date()
+            let start = NSDate()
             let response = try app.client.get("https://pgorelease.nianticlabs.com/plfe/")
-            let responseTime = Date().timeIntervalSince(start)
+            let responseTime = start.timeIntervalSinceNow * (-1)
             print(responseTime)
-            if responseTime < 1.0 {
+            if responseTime < 0.8 {
                 try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online. Catch 'em all! :pokeball:"))
             } else if responseTime < 3.0 {
                 try ws.send(SlackMessage(to: channel, text: "The servers are struggling... :muk:"))
