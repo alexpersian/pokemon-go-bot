@@ -27,8 +27,13 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
         } else if text.hasPrefix("status") {
-            let response = SlackMessage(to: channel, text: "Servers are on fire!!!")
-            try ws.send(response)
+            guard let response = try? Application().client.get("https://pgorelease.nianticlabs.com/plfe/") else { print("failure"); return }
+            switch response.status {
+            case Status.ok:
+                try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online :pokeball:"))
+            default:
+                try ws.send(SlackMessage(to: channel, text: "🔥 Servers are on fire!!! 🔥"))
+            }
         }
     }
 
