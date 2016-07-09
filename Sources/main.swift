@@ -32,7 +32,7 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
         } else if text.hasPrefix("server status") {
 
             let start = NSDate()
-            guard let response = try? app.client.get("https://pgorelease.nianticlabs.com/plfe/") else { print("[RESPONSE FAILURE]"); return }
+            guard let response = try? HTTPClient<TLSClientStream>.get("https://pgorelease.nianticlabs.com/plfe/") else { print("[RESPONSE FAILURE]"); return }
 
             let responseTime = start.timeIntervalSinceNow * (-1)
             print(responseTime)
