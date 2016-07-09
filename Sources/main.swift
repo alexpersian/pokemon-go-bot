@@ -26,6 +26,9 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
         } else if text.hasPrefix("version") {
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
+        } else if text.hasPrefix("status") {
+            let response = SlackMessage(to: channel, text: "Servers are on fire!!!")
+            try ws.send(response)
         }
     }
 
