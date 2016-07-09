@@ -1,5 +1,6 @@
 import Vapor
 import VaporTLS
+import Foundation
 
 let VERSION = "0.1.0"
 
@@ -8,6 +9,8 @@ guard let token = config["bot-config", "token"].string else { throw BotError.mis
 
 let rtmResponse = try HTTPClient.loadRealtimeApi(token: token)
 guard let webSocketURL = rtmResponse.data["url"].string else { throw BotError.invalidResponse }
+
+let app = Application()
 
 try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self) { ws in
     print("Connected to \(webSocketURL)")
@@ -26,15 +29,17 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
         } else if text.hasPrefix("version") {
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
-        } else if text.hasPrefix("status") {
-            guard let response = try? Application().client.get("https://pgorelease.nianticlabs.com/plfe/") else { print("failure"); return }
-            switch response.status {
-            case Status.ok:
-                try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online :pokeball:"))
-            case Status.badRequest:
-                try ws.send(SlackMessage(to: channel, text: "🔥 Servers are on fire!!! 🔥"))
-            default:
-                try ws.send(SlackMessage(to: channel, text: "🔥 Servers are on fire!!! 🔥"))
+        } else if text.hasPrefix("server status") {
+            let start = Date()
+            let response = try app.client.get("https://pgorelease.nianticlabs.com/plfe/")
+            let responseTime = Date().timeIntervalSince(start)
+            print(responseTime)
+            if responseTime < 1.0 {
+                try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online. Catch 'em all! :pokeball:"))
+            } else if responseTime < 3.0 {
+                try ws.send(SlackMessage(to: channel, text: "The servers are struggling... :muk:"))
+            } else {
+                try ws.send(SlackMessage(to: channel, text: ":magmar: Servers are on fire!!! :magmar:"))
             }
         }
     }
