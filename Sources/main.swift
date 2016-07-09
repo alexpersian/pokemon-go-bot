@@ -31,6 +31,8 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
             switch response.status {
             case Status.ok:
                 try ws.send(SlackMessage(to: channel, text: "Pokémon GO servers are currently online :pokeball:"))
+            case Status.badRequest:
+                try ws.send(SlackMessage(to: channel, text: "🔥 Servers are on fire!!! 🔥"))
             default:
                 try ws.send(SlackMessage(to: channel, text: "🔥 Servers are on fire!!! 🔥"))
             }
