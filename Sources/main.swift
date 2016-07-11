@@ -23,13 +23,13 @@ try WebSocket.connect(to: webSocketURL, using: HTTPClient<TLSClientStream>.self)
             let text = event["text"].string
             else { return }
 
-        if text.hasPrefix("hello") {
+        if text.lowercased().hasPrefix("hello") {
             let response = SlackMessage(to: channel, text: "Hi there 👋")
             try ws.send(response)
-        } else if text.hasPrefix("version") {
+        } else if text.lowercased().hasPrefix("version") {
             let response = SlackMessage(to: channel, text: "Current Version: \(VERSION)")
             try ws.send(response)
-        } else if text.hasPrefix("server status") {
+        } else if text.lowercased().hasPrefix("server status") {
 
             let start = NSDate()
             guard let response = try? HTTPClient<TLSClientStream>.get("https://pgorelease.nianticlabs.com/plfe/") else { print("[RESPONSE FAILURE]"); return }
